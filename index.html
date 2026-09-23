@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="hu">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mc isti kahoot</title>
+  <meta name="description"
+    content="10 videópár a mappából sorrendben! Találd ki, mit fog mondani a szereplő a videóban!">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  <div class="bg-particles" id="bg-particles"></div>
+
+  <canvas id="confetti-canvas"></canvas>
+
+  <div class="app-container">
+    <header class="app-header">
+      <div class="logo-area" id="btn-home" title="Vissza a kezdőlapra">
+        <span class="logo-icon">🎬</span>
+        <span class="logo-title">Mc pityesz Kahoot</span>
+      </div>
+
+      <div class="header-actions">
+        <button class="icon-btn" id="btn-fullscreen" title="Teljes képernyő">
+          <span>⛶</span>
+        </button>
+      </div>
+    </header>
+
+    <section class="screen active" id="screen-lobby">
+      <div class="lobby-hero">
+        <h1>Mit mond a videóban? 🎙️</h1>
+        <p>
+          A mappádban lévő <strong>11 videó jön sorban</strong> egymás után!<br>
+          1️⃣ Lemegy az <strong>1. rész</strong>, majd a legizgalmasabb pillanatban megáll.<br>
+          2️⃣ <strong>Tippeld meg</strong> a 4 gomb közül, mit mond!<br>
+          3️⃣ A válasz után <strong>automatikusan elindul a 2. rész (folytatás)</strong>, és kiderül a megoldás!
+        </p>
+
+        <div class="player-input-card">
+          <div class="input-group">
+            <input type="text" id="player-nickname" placeholder="Add meg a beceneved..." maxlength="16" value="">
+          </div>
+          <button class="btn-primary" id="btn-start-game">
+            🚀 JÁTÉK INDÍTÁSA (11 KÉRDÉS)
+          </button>
+        </div>
+
+        <div style="margin-top: 20px; font-size: 14px; color: var(--text-muted);">
+          <span>🎬 Betöltött videók: <strong>11 / 11 pár kész</strong></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-arena">
+      <div class="arena-topbar">
+        <div class="stat-pill">
+          <span class="label">Kérdés:</span>
+          <span id="hud-question-number" style="color: #fff; font-size: 18px;">1 / 11</span>
+        </div>
+
+        <div class="stat-pill" id="hud-timer-container">
+          <span class="label">Idő:</span>
+          <span id="hud-timer" style="color: #ffd166; font-size: 20px; font-weight: 800;">⏱️ 15 mp</span>
+        </div>
+
+        <div class="stat-pill">
+          <span id="hud-streak" class="streak-badge" style="display: none;">🔥 2x Széria!</span>
+        </div>
+
+        <div class="stat-pill">
+          <span class="label">Pontszám:</span>
+          <span id="hud-score" style="color: #ffd166; font-size: 20px;">0</span>
+        </div>
+      </div>
+
+      <div class="video-stage" id="video-stage">
+        <div class="video-state-badge" id="video-badge">
+          <span id="video-badge-icon">🎬</span>
+          <span id="video-badge-text">1. Rész lejátszása...</span>
+        </div>
+
+        <div class="part-indicator-badge" id="part-indicator">
+          1. RÉSZ (KÉRDÉS)
+        </div>
+
+        <video id="quiz-video" playsinline></video>
+
+        <div class="video-timeline-bar">
+          <div class="timeline-progress" id="timeline-progress"></div>
+        </div>
+      </div>
+
+      <div class="reveal-banner" id="reveal-banner">
+        <div class="reveal-info">
+          <div class="reveal-status-icon" id="reveal-icon">🎉</div>
+          <div class="reveal-status-text">
+            <h3 id="reveal-title">Helyes válasz!</h3>
+            <p id="reveal-explanation">Most megy a 2. rész a leleplezéssel...</p>
+          </div>
+        </div>
+        <div class="reveal-actions">
+          <button class="btn-next" id="btn-next-question">
+            Következő videó ➔
+          </button>
+        </div>
+      </div>
+
+      <div class="answers-grid" id="answers-grid">
+        <button class="answer-card card-red" data-index="0" id="card-0" disabled>
+          <div class="symbol-box">▲</div>
+          <div class="answer-text" id="ans-text-0">1. Válaszlehetőség</div>
+        </button>
+
+        <button class="answer-card card-blue" data-index="1" id="card-1" disabled>
+          <div class="symbol-box">◆</div>
+          <div class="answer-text" id="ans-text-1">2. Válaszlehetőség</div>
+        </button>
+
+        <button class="answer-card card-yellow" data-index="2" id="card-2" disabled>
+          <div class="symbol-box">●</div>
+          <div class="answer-text" id="ans-text-2">3. Válaszlehetőség</div>
+        </button>
+
+        <button class="answer-card card-green" data-index="3" id="card-3" disabled>
+          <div class="symbol-box">■</div>
+          <div class="answer-text" id="ans-text-3">4. Válaszlehetőség</div>
+        </button>
+      </div>
+    </section>
+
+    <section class="screen" id="screen-podium">
+      <div class="podium-screen">
+        <h2>🏆 Végeredmény</h2>
+        <p class="subtitle">Végigjátszottad a kvízt! Íme az eredményed:</p>
+
+        <div class="final-player-badge">
+          <span class="player-icon">👑</span>
+          <span class="player-name" id="podium-winner-name">Bajnok</span>
+        </div>
+
+        <div class="final-summary-card">
+          <div class="summary-item">
+            <span class="num" id="stat-final-score">0</span>
+            <span class="desc">Összpontszám</span>
+          </div>
+          <div class="summary-item">
+            <span class="num" id="stat-final-accuracy">0%</span>
+            <span class="desc">Helyes válaszarány</span>
+          </div>
+          <div class="summary-item">
+            <span class="num" id="stat-final-streak">0</span>
+            <span class="desc">Legnagyobb széria 🔥</span>
+          </div>
+        </div>
+
+        <div class="podium-actions">
+          <button class="btn-primary" id="btn-replay">
+            🔄 Újra Játszom
+          </button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="modal-overlay" id="editor-modal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2>✏️ Kérdések és Válaszok Testreszabása</h2>
+        <button class="modal-close" id="btn-close-modal">&times;</button>
+      </div>
+
+      <div class="editor-form">
+        <div class="form-group">
+          <label>Válaszd ki a szerkeszteni kívánt videót (1 - 10):</label>
+          <select id="edit-question-select"
+            style="background: rgba(0,0,0,0.4); color: #fff; padding: 10px; border-radius: var(--radius-sm); border: 1px solid rgba(255,255,255,0.2); font-size: 15px;">
+            <option value="0">1. Videó (elsoelso.mp4 / elsomasodik.mp4)</option>
+            <option value="1">2. Videó (masodikelso.mp4 / masodikmaosdik.mp4)</option>
+            <option value="2">3. Videó (harmadikelso.mp4 / harmadikmasodik.mp4)</option>
+            <option value="3">4. Videó (negyedikelso.mp4 / negyedikmasodik.mp4)</option>
+            <option value="4">5. Videó (otodikelso.mp4 / otodikmasodik.mp4)</option>
+            <option value="5">6. Videó (hatodikelso.mp4 / hatodikmasodik.mp4)</option>
+            <option value="6">7. Videó (hetedikelso.mp4 / hetedikmasodik.mp4)</option>
+            <option value="7">8. Videó (nyolcadikelso.mp4 / nyolcadikmasodik.mp4)</option>
+            <option value="8">9. Videó (kilencelso.mp4 / kilencmasodik.mp4)</option>
+            <option value="9">10. Videó (tizelso.mp4 / tizmasodik.mp4)</option>
+            <option value="10">11. Videó (tizenegyelso.mp4 / tizenegymasodik.mp4)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Kérdés címe:</label>
+          <input type="text" id="editor-q-title" placeholder="Pl.: Mit mond a szereplő?">
+        </div>
+
+        <div class="form-group">
+          <label>Segítő szöveg / Utalás (opcionális):</label>
+          <input type="text" id="editor-q-hint" placeholder="Pl.: Figyeld a szemét...">
+        </div>
+
+        <div class="form-group">
+          <label>4 Válaszlehetőség (és jelöld be a helyes választ a rádiógombbal):</label>
+          <div class="editor-answers-grid">
+            <div class="editor-answer-item c-0">
+              <input type="radio" name="editor-correct" value="0" checked title="Helyes válasz">
+              <span style="font-weight: 700; color: var(--kahoot-red);">▲</span>
+              <input type="text" id="editor-ans-0" placeholder="1. Válasz (Piros)">
+            </div>
+            <div class="editor-answer-item c-1">
+              <input type="radio" name="editor-correct" value="1" title="Helyes válasz">
+              <span style="font-weight: 700; color: var(--kahoot-blue);">◆</span>
+              <input type="text" id="editor-ans-1" placeholder="2. Válasz (Kék)">
+            </div>
+            <div class="editor-answer-item c-2">
+              <input type="radio" name="editor-correct" value="2" title="Helyes válasz">
+              <span style="font-weight: 700; color: var(--kahoot-yellow);">●</span>
+              <input type="text" id="editor-ans-2" placeholder="3. Válasz (Sárga)">
+            </div>
+            <div class="editor-answer-item c-3">
+              <input type="radio" name="editor-correct" value="3" title="Helyes válasz">
+              <span style="font-weight: 700; color: var(--kahoot-green);">■</span>
+              <input type="text" id="editor-ans-3" placeholder="4. Válasz (Zöld)">
+            </div>
+          </div>
+        </div>
+
+        <div class="editor-modal-actions">
+          <button class="btn-primary" id="btn-save-edited-question" type="button">💾 Mentés Ennél a Kérdésnél</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="audio.js"></script>
+  <script src="default-quiz.js"></script>
+  <script src="app.js"></script>
+</body>
+
+</html>
