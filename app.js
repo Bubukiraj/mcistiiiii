@@ -287,9 +287,9 @@ class KahootVideoGame {
 
   toggleFullscreen() {
     if (!document.fullscreenElement) {
-      document.documentElement.requestFullscreen().catch(() => {});
+      document.documentElement.requestFullscreen().catch(() => { });
     } else {
-      document.exitFullscreen().catch(() => {});
+      document.exitFullscreen().catch(() => { });
     }
   }
 
@@ -384,7 +384,7 @@ class KahootVideoGame {
         if (p !== undefined) {
           p.catch(() => {
             vid.muted = true;
-            vid.play().catch(() => {});
+            vid.play().catch(() => { });
           });
         }
       };
@@ -404,7 +404,7 @@ class KahootVideoGame {
     if (this.gameState === 'GUESSING') return;
     this.gameState = 'GUESSING';
 
-    this.updateVideoBadge('Mit fog mondani az úr a videoban?', true);
+    this.updateVideoBadge('🛑', 'Mit fog mondani az úr a videóban?', true);
     if (window.soundEngine) window.soundEngine.playCliffhanger();
 
     this.dom.cards.forEach(card => {
@@ -522,10 +522,15 @@ class KahootVideoGame {
   handleTimeout(q) {
     if (this.hasAnswered) return;
     this.hasAnswered = true;
+    this.gameState = 'TIMEOUT';
+
+    clearInterval(this.timerInterval);
+    clearInterval(this.timeTickerInterval);
 
     this.streak = 0;
     this.updateStreakBadge();
-    if (window.soundEngine) window.soundEngine.playTimesUp();
+
+    try { if (window.soundEngine) window.soundEngine.playWrong(); } catch(e) {}
 
     this.dom.cards.forEach((card, idx) => {
       if (!card) return;
@@ -539,8 +544,8 @@ class KahootVideoGame {
 
     const correctText = (q.options && q.options[q.correctIndex]) ? q.options[q.correctIndex].text : '';
     this.showRevealBanner(
-      '⏰',
-      'Lejárt az idő!',
+      '❌',
+      'Lejárt az idő! (0 pont)',
       q.explanation || `A helyes válasz: ${correctText}`
     );
 
@@ -566,7 +571,7 @@ class KahootVideoGame {
         vid.muted = false;
         vid.play().catch(() => {
           vid.muted = true;
-          vid.play().catch(() => {});
+          vid.play().catch(() => { });
         });
       };
 
@@ -611,12 +616,22 @@ class KahootVideoGame {
   }
 
   nextQuestion() {
+    const vid = this.dom.quizVideo;
+    if (vid) {
+      vid.pause();
+      vid.currentTime = 0;
+    }
     this.currentIndex++;
     this.loadQuestion(this.currentIndex);
   }
 
   showPodium() {
     this.gameState = 'PODIUM';
+    const vid = this.dom.quizVideo;
+    if (vid) {
+      vid.pause();
+      vid.currentTime = 0;
+    }
     this.switchScreen('screen-podium');
 
     if (this.dom.podiumWinnerName) this.dom.podiumWinnerName.innerText = this.playerName;
