@@ -404,7 +404,7 @@ class KahootVideoGame {
     if (this.gameState === 'GUESSING') return;
     this.gameState = 'GUESSING';
 
-    this.updateVideoBadge('🛑', 'ÁLLJ! Mit mond a videóban? Tippelj!', true);
+    this.updateVideoBadge('Mit fog mondani az úr a videoban?', true);
     if (window.soundEngine) window.soundEngine.playCliffhanger();
 
     this.dom.cards.forEach(card => {
